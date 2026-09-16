@@ -316,11 +316,17 @@ def import_price_list_flow():
 
     print(f"Deduplicated: {len(result['deduplicated'])}")
     for item in result["deduplicated"]:
-        print(f"  {item['seat_class']} ({item['reason']})")
+        print(
+            f"  {item['seat_class']}: {item['raw_price']!r} "
+            f"({item['reason']})"
+        )
 
     print(f"Rejected: {len(result['rejected'])}")
     for item in result["rejected"]:
-        print(f"  {item['seat_class']} ({item['reason']})")
+        print(
+            f"  {item['seat_class']}: {item['raw_price']!r} "
+            f"({item['reason']})"
+        )
     print("========================================")
 
 

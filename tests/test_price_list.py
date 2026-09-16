@@ -1,6 +1,8 @@
+import tempfile
 import unittest
+from pathlib import Path
 
-from habit_tracker.price_list import clean_price_list
+from habit_tracker.price_list import clean_price_list, import_price_list_from_csv
 
 
 class PriceListTests(unittest.TestCase):
@@ -30,11 +32,50 @@ class PriceListTests(unittest.TestCase):
         result = clean_price_list([{"seat_class": "Economy", "price": "  "}])
         self.assertEqual(result["imported"], [])
         self.assertEqual(result["rejected"][0]["reason"], "price is blank")
+        self.assertEqual(result["rejected"][0]["raw_price"], "  ")
 
     def test_negative_price_is_rejected(self):
         result = clean_price_list([{"seat_class": "Business", "price": "-500"}])
         self.assertEqual(result["imported"], [])
         self.assertEqual(result["rejected"][0]["reason"], "price cannot be negative")
+        self.assertEqual(result["rejected"][0]["raw_price"], "-500")
+
+    def test_missing_seat_class_is_rejected(self):
+        result = clean_price_list([{"seat_class": "", "price": "1200"}])
+        self.assertEqual(result["imported"], [])
+        self.assertEqual(result["rejected"][0]["reason"], "seat_class is blank")
+        self.assertEqual(result["rejected"][0]["raw_price"], "1200")
+
+    def test_duplicate_report_keeps_dropped_raw_value(self):
+        result = clean_price_list([
+            {"seat_class": "Economy", "price": "abc"},
+            {"seat_class": "economy", "price": "1200"},
+            {"seat_class": "ECONOMY", "price": "1300"},
+        ])
+        self.assertEqual(result["rejected"][0]["raw_price"], "abc")
+        self.assertEqual(result["deduplicated"][0]["raw_price"], "1200")
+
+    def test_csv_extra_columns_are_rejected(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as file:
+            file.write("seat_class,price\nEconomy,1200,unexpected\n")
+            path = file.name
+        try:
+            result = import_price_list_from_csv(path)
+        finally:
+            Path(path).unlink()
+
+        self.assertEqual(result["imported"], [])
+        self.assertIn("extra columns", result["rejected"][0]["reason"])
+
+    def test_csv_wrong_delimiter_is_rejected(self):
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as file:
+            file.write("seat_class;price\nEconomy;1200\n")
+            path = file.name
+        try:
+            with self.assertRaises(ValueError):
+                import_price_list_from_csv(path)
+        finally:
+            Path(path).unlink()
 
     def test_fully_valid_row_is_imported_in_title_case(self):
         result = clean_price_list([{"seat_class": "premium economy", "price": "₹1,499.50"}])

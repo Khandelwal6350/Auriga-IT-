@@ -261,6 +261,8 @@ The application uses SQLite to persist data locally in a file named `habit_track
 
 The database is created automatically if it does not already exist.
 
+Database initialization runs automatically when `database.py` is imported, so a fresh clone or extracted project can run the tests and application without a manual database setup step. `main.py` also calls `initialize_database()` explicitly at startup.
+
 ### Tables used
 
 - `habits`
@@ -350,7 +352,9 @@ The importer cleans whitespace, commas, the rupee symbol, the `/-` suffix, and d
 
 Case-insensitive duplicate names such as `Economy`, `economy`, and `ECONOMY` are treated as one class. Invalid rows are rejected with a reason. When multiple valid prices exist for one class, the last valid row is imported and earlier valid rows are reported as deduplicated.
 
-The terminal report shows the number and values imported, deduplicated class names and reasons, and rejected class names with validation reasons.
+Rejected and deduplicated records include their original raw seat class and raw price, making source-data debugging clear. Rows with a blank `seat_class`, extra CSV columns, missing required headers, or a wrong delimiter are rejected or reported as malformed instead of being silently accepted.
+
+The terminal report shows the number and values imported, deduplicated class names and raw values, and rejected class names, raw prices, and validation reasons.
 
 ---
 

@@ -39,27 +39,53 @@ def clean_price_list(raw_rows: list[dict]) -> dict:
 
     for row in raw_rows:
         raw_name = row.get("seat_class", "")
+        raw_price = row.get("price")
         display_name, class_key = _normalise_class_name(raw_name)
-        try:
-            price = _parse_price(row.get("price"))
-        except (TypeError, ValueError) as exc:
-            rejected.append({"seat_class": display_name or str(raw_name), "reason": str(exc)})
+
+        if not display_name:
+            rejected.append({
+                "seat_class": "<missing>",
+                "raw_seat_class": raw_name,
+                "raw_price": raw_price,
+                "reason": "seat_class is blank",
+            })
             continue
-        valid_rows.append((class_key, display_name, price))
+
+        try:
+            price = _parse_price(raw_price)
+        except (TypeError, ValueError) as exc:
+            rejected.append({
+                "seat_class": display_name,
+                "raw_seat_class": raw_name,
+                "raw_price": raw_price,
+                "reason": str(exc),
+            })
+            continue
+        valid_rows.append((class_key, display_name, price, raw_name, raw_price))
 
     deduplicated = []
-    for class_key, display_name, price in valid_rows:
+    for class_key, display_name, price, raw_name, raw_price in valid_rows:
         previous = imported_by_key.get(class_key)
         if previous is not None:
             deduplicated.append({
                 "seat_class": previous["seat_class"],
                 "price": previous["price"],
+                "raw_seat_class": previous["raw_seat_class"],
+                "raw_price": previous["raw_price"],
                 "reason": "duplicate seat class; replaced by the last valid record",
             })
-        imported_by_key[class_key] = {"seat_class": display_name, "price": price}
+        imported_by_key[class_key] = {
+            "seat_class": display_name,
+            "price": price,
+            "raw_seat_class": raw_name,
+            "raw_price": raw_price,
+        }
 
     return {
-        "imported": list(imported_by_key.values()),
+        "imported": [
+            {"seat_class": item["seat_class"], "price": item["price"]}
+            for item in imported_by_key.values()
+        ],
         "deduplicated": deduplicated,
         "rejected": rejected,
     }
@@ -68,7 +94,24 @@ def clean_price_list(raw_rows: list[dict]) -> dict:
 def import_price_list_from_csv(path: str) -> dict:
     """Read a seat-class price CSV and clean its rows."""
     with open(path, "r", newline="", encoding="utf-8") as csv_file:
-        reader = csv.DictReader(csv_file)
+        reader = csv.DictReader(csv_file, restkey="__extra_columns__")
         if reader.fieldnames is None or {"seat_class", "price"} - set(reader.fieldnames):
             raise ValueError("CSV must contain seat_class and price columns")
-        return clean_price_list(list(reader))
+
+        clean_rows = []
+        malformed_rows = []
+        for row_number, row in enumerate(reader, start=2):
+            extra_columns = row.pop("__extra_columns__", None)
+            if extra_columns:
+                malformed_rows.append({
+                    "seat_class": row.get("seat_class") or "<missing>",
+                    "raw_seat_class": row.get("seat_class"),
+                    "raw_price": row.get("price"),
+                    "reason": f"row {row_number} contains extra columns",
+                })
+            else:
+                clean_rows.append(row)
+
+        result = clean_price_list(clean_rows)
+        result["rejected"] = malformed_rows + result["rejected"]
+        return result

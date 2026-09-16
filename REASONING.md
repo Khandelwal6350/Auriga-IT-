@@ -134,8 +134,14 @@ Potential future work includes CSV export, habit categories, overdue flags, and 
 
 The seat-class price-list feature is kept separate from the habit database because it is a stateless import and cleaning operation. `habit_tracker/price_list.py` uses only the standard-library `csv` and `re` modules and returns a structured report instead of silently discarding bad input.
 
-Price parsing accepts the specified human-entered formats, removes presentation characters such as commas and the rupee symbol, and converts the result to a float. Blank, unparseable, zero, and negative prices are rejected with reasons so the user can correct the source CSV.
+Price parsing uses one anchored regular expression so the complete value must match a supported format. It removes presentation characters such as commas, the rupee symbol, whitespace, and the `/-` suffix before converting the result to a float. Blank, unparseable, zero, and negative prices are rejected with reasons so the user can correct the source CSV.
 
 Class names are compared case-insensitively after whitespace normalization. Only valid positive rows participate in deduplication: if several valid rows describe the same class, the last valid price wins because it is the most recent source value, while earlier valid rows are recorded as deduplicated. Invalid rows remain in the rejected list rather than being hidden by a duplicate class.
 
-The terminal menu reports imported values, duplicate names, and rejected names with reasons. This keeps the feature useful for a one-time CSV cleanup without adding a new persistence layer or external dependency.
+The clean imported list intentionally contains only the required normalized fields, `seat_class` and `price`. Rejected and deduplicated records additionally preserve `raw_seat_class` and `raw_price`, because the original source value is essential when a reviewer or user needs to debug a bad row.
+
+CSV parsing uses `DictReader` with an explicit extra-column key. Missing headers, wrong delimiters, and rows with extra columns are reported instead of allowing malformed data to be partially imported. A blank seat class is also rejected explicitly.
+
+Database setup is performed automatically when `database.py` is imported. This preserves the simple explicit startup call in `main.py` while ensuring tests and direct helper imports work immediately from a fresh clone with no existing `habit_tracker.db` file.
+
+The terminal menu reports imported values, duplicate names and raw values, and rejected names, raw values, and reasons. This keeps the feature useful for a one-time CSV cleanup without adding a new persistence layer or external dependency.

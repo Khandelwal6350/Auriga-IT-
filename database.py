@@ -222,3 +222,7 @@ def habit_is_completed_on_date(habit_id, completion_date):
         return row is not None
     finally:
         connection.close()
+
+
+# Ensure a fresh clone can run tests and database helpers immediately.
+initialize_database()
