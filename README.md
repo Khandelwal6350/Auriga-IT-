@@ -26,6 +26,7 @@ The program lets users:
 - review completion history
 - track 75-day challenge progress
 - get a terminal-based morning reminder for incomplete habits
+- import and clean seat-class price lists from CSV files
 
 This is a simple, clean, interview-friendly Python project built specifically for the Auriga IT Builder Round.
 
@@ -141,6 +142,7 @@ This project intentionally avoids unnecessary dependencies and external packages
 ├── habit_tracker/
 │   ├── __init__.py
 │   ├── habit_manager.py
+│   ├── price_list.py
 │   └── streak.py
 ├── main.py
 ├── requirements.txt
@@ -155,6 +157,7 @@ This project intentionally avoids unnecessary dependencies and external packages
 - `main.py` – terminal menu and user flow
 - `database.py` – SQLite connection and table creation
 - `habit_tracker/habit_manager.py` – add, update, archive, search, complete, and history logic
+- `habit_tracker/price_list.py` – CSV price-list parsing, cleaning, validation, and deduplication
 - `habit_tracker/streak.py` – schedule-aware streak calculations
 - `tests/test_streak.py` – core streak tests
 - `tests/test_reminder.py` – reminder-specific tests
@@ -219,7 +222,8 @@ This will show the main terminal menu:
 9. Restore Habit
 10. View Habit History
 11. View 75-Day Challenge Progress
-12. Exit
+12. Import Seat-Class Price List
+13. Exit
 ========================================
 ```
 
@@ -241,6 +245,9 @@ The test suite covers:
 - broken streak behavior
 - non-scheduled days not breaking streaks
 - reminder pending behavior
+- seat-class price parsing and CSV cleaning
+- case-insensitive price-list deduplication
+- invalid, blank, and negative price rejection
 - archived habits exclusion
 - future habit exclusion
 - ended habit exclusion
@@ -325,6 +332,25 @@ It checks:
 - archived status
 
 The reminder does not create completion records; it only reads the data. It is a terminal reminder and does not depend on any browser or desktop notifications.
+
+---
+
+## Seat-Class Price List Import
+
+The menu option `Import Seat-Class Price List` reads a CSV file with these columns:
+
+```csv
+seat_class,price
+Economy,"1,200"
+Business,₹2500.00
+First Class,3500/-
+```
+
+The importer cleans whitespace, commas, the rupee symbol, the `/-` suffix, and decimal prices. Clean names are returned in Title Case and prices are returned as floats.
+
+Case-insensitive duplicate names such as `Economy`, `economy`, and `ECONOMY` are treated as one class. Invalid rows are rejected with a reason. When multiple valid prices exist for one class, the last valid row is imported and earlier valid rows are reported as deduplicated.
+
+The terminal report shows the number and values imported, deduplicated class names and reasons, and rejected class names with validation reasons.
 
 ---
 

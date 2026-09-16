@@ -17,6 +17,7 @@ from habit_tracker.habit_manager import (
     archive_habit_record,
     restore_habit_record,
 )
+from habit_tracker.price_list import import_price_list_from_csv
 
 
 def show_menu():
@@ -35,7 +36,8 @@ def show_menu():
     print("9. Restore Habit")
     print("10. View Habit History")
     print("11. View 75-Day Challenge Progress")
-    print("12. Exit")
+    print("12. Import Seat-Class Price List")
+    print("13. Exit")
     print("=" * 40)
 
 
@@ -293,6 +295,35 @@ def view_challenge_progress():
             print("Invalid date. Challenge start date was not changed.")
 
 
+def import_price_list_flow():
+    path = safe_input("CSV file path: ")
+    if not path:
+        print("File path cannot be empty.")
+        return
+
+    try:
+        result = import_price_list_from_csv(path)
+    except (OSError, ValueError) as exc:
+        print(f"Error importing price list: {exc}")
+        return
+
+    print("\n========================================")
+    print("SEAT-CLASS PRICE LIST IMPORT REPORT")
+    print("========================================")
+    print(f"Imported: {len(result['imported'])}")
+    for item in result["imported"]:
+        print(f"  {item['seat_class']}: {item['price']:.2f}")
+
+    print(f"Deduplicated: {len(result['deduplicated'])}")
+    for item in result["deduplicated"]:
+        print(f"  {item['seat_class']} ({item['reason']})")
+
+    print(f"Rejected: {len(result['rejected'])}")
+    for item in result["rejected"]:
+        print(f"  {item['seat_class']} ({item['reason']})")
+    print("========================================")
+
+
 def show_morning_reminder():
     from datetime import datetime
 
@@ -353,10 +384,12 @@ def main():
         elif choice == "11":
             view_challenge_progress()
         elif choice == "12":
+            import_price_list_flow()
+        elif choice == "13":
             print("Goodbye!")
             break
         else:
-            print("Invalid menu choice. Please select a number from 1 to 12.")
+            print("Invalid menu choice. Please select a number from 1 to 13.")
 
         safe_input("\nPress Enter to continue...")
 

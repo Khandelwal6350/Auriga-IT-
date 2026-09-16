@@ -129,3 +129,13 @@ This project deliberately avoids over-engineering. It uses a single database fil
 ## Future improvements
 
 Potential future work includes CSV export, habit categories, overdue flags, and smarter reporting. None of these are required for this assessment, and they would not be added until the core functionality is fully correct.
+
+## Seat-class price-list import
+
+The seat-class price-list feature is kept separate from the habit database because it is a stateless import and cleaning operation. `habit_tracker/price_list.py` uses only the standard-library `csv` and `re` modules and returns a structured report instead of silently discarding bad input.
+
+Price parsing accepts the specified human-entered formats, removes presentation characters such as commas and the rupee symbol, and converts the result to a float. Blank, unparseable, zero, and negative prices are rejected with reasons so the user can correct the source CSV.
+
+Class names are compared case-insensitively after whitespace normalization. Only valid positive rows participate in deduplication: if several valid rows describe the same class, the last valid price wins because it is the most recent source value, while earlier valid rows are recorded as deduplicated. Invalid rows remain in the rejected list rather than being hidden by a duplicate class.
+
+The terminal menu reports imported values, duplicate names, and rejected names with reasons. This keeps the feature useful for a one-time CSV cleanup without adding a new persistence layer or external dependency.
