@@ -1,62 +1,79 @@
-I have a 2.5-hour coding assessment for Auriga IT Builder Round.
+# 75-Day Habit Tracker
 
-I need to build the following problem:
+## Project Overview
+Explain what the project does, its purpose, and how it helps users manage habits during a 75-day challenge.
 
-"Ananya’s 75-day challenge
+## Features
+Document the implemented features, including:
+- Add Habit
+- View Today's Habits
+- Complete Habit
+- Duplicate completion prevention
+- Current streak
+- Best-ever streak
+- Daily schedule
+- Weekday schedule
+- Custom-day schedule
+- Search Habit
+- Update Habit
+- Archive Habit
+- Restore Habit
+- Habit History
+- 75-Day Challenge Progress
+- Morning Habit Reminder
+- Input validation
+- Persistent SQLite storage
 
-Ananya has started a 75-day self-improvement challenge — drink water,
-read, work out, no sugar. She’s juggling several habits at once:
-some she does every day, some only on weekdays.
+Only include features that are actually implemented.
 
-Each morning she just wants to see today’s habits and tick them off
-one by one.
+## Morning Habit Reminder
+Explain how the application reminds the user each morning about habits that are still pending for the current day.
 
-She’s fiercely proud of her streaks and genuinely gutted when she
-breaks one, so for every habit she wants to know her current streak
-and her best-ever streak.
+Explain that the reminder is terminal-based and should consider:
+- Active habits only
+- Habits scheduled for the current day
+- Habits that have started
+- Habits that have not expired
+- Habits that have not already been completed today
+- Archived habits must be excluded
 
-Weeks in, her list has grown long — there are a couple she’s quietly
-given up on and wants out of the way (but not gone forever), and she
-keeps hunting for a particular one to update it.
+Only describe behavior that is actually implemented in the code.
 
-Build Ananya something so she keeps her streaks alive.
-
-The application should be generic and work for any user and any
-habits, not only Ananya."
-
-IMPORTANT:
-
-I do NOT want HTML, CSS, React, Streamlit, or a web application.
-
-Build a NORMAL TERMINAL/CONSOLE BASED Python application.
-
-Use:
-
+## Technology Stack
+Include the actual technologies used, such as:
 - Python
 - SQLite
-- Standard Python libraries wherever possible
+- Standard Python libraries
+- pytest, if used by the project tests
 
-Keep the project simple, clean, reliable and easy to explain in an
-interview.
+Do not add unnecessary technologies.
 
-Do NOT over-engineer the project.
+## Project Structure
+Document the actual current project structure and briefly explain the responsibility of each important file.
 
-==================================================
-CORE REQUIREMENTS
-==================================================
+For example, if these files exist:
 
-Create a menu-driven Habit Tracker application.
+habit_tracker/
+├── __init__.py
+├── habit_manager.py
+└── streak.py
 
-When I run:
+tests/
+├── test_streak.py
+└── test_reminder.py
 
-python main.py
+main.py
+database.py
+README.md
+REASONING.md
+AI_LOGS.md
+requirements.txt
+.gitignore
 
-the application should show a menu such as:
+Make sure the structure matches the actual project.
 
-========================================
-       75-DAY HABIT TRACKER
-       Krishna Khandelwal
-========================================
+## Application Menu
+Document the terminal menu and explain each option:
 
 1. View Today's Habits
 2. Add Habit
@@ -71,588 +88,138 @@ the application should show a menu such as:
 11. View 75-Day Challenge Progress
 12. Exit
 
-The user can select options from the terminal.
-
-==================================================
-1. ADD HABIT
-==================================================
-
-Allow the user to create a habit.
-
-Store:
-
-- habit ID
-- habit name
-- description
-- schedule
-- start date
-- end date
-- archived status
-- created date
-
-Schedule options:
-
-1. Every day
-2. Weekdays
-3. Custom days
-
-For custom days allow:
-
-Monday
-Tuesday
-Wednesday
-Thursday
-Friday
-Saturday
-Sunday
-
-Example:
-
-Habit:
-Drink Water
-
-Schedule:
-Every day
-
-Another:
-
-Workout
-
-Schedule:
-Monday, Wednesday, Friday
-
-==================================================
-2. VIEW TODAY'S HABITS
-==================================================
-
-This is the main feature.
-
-When the user selects:
-
-View Today's Habits
-
-show only ACTIVE habits that are scheduled for today.
-
-Example:
-
-Today's Date: 2026-09-16
-
-1. Drink Water       [Completed]     Current: 5 days
-2. Read Book         [Pending]       Current: 3 days
-3. Workout           [Pending]       Current: 2 days
-
-The user should immediately know what needs to be completed today.
-
-Archived habits must NOT appear in today's active list.
-
-==================================================
-3. COMPLETE HABIT
-==================================================
-
-Allow the user to select a habit and mark it completed for today.
-
-Example:
-
-Enter habit ID: 2
-
-Habit "Read Book" marked as completed.
-
-Do not allow duplicate completion for the same habit on the same date.
-
-If the habit has already been completed today, display:
-
-Habit is already completed today.
-
-==================================================
-4. CURRENT STREAK
-==================================================
-
-Calculate the current streak correctly.
-
-Current streak means consecutive SCHEDULED occurrences that have
-been completed.
-
-IMPORTANT:
-
-Do NOT simply compare yesterday and today.
-
-The algorithm must understand the habit schedule.
-
-Example:
-
-Schedule:
-Monday, Wednesday, Friday
-
-Completion:
-
-Monday      YES
-Tuesday     -
-Wednesday   YES
-Thursday    -
-Friday      YES
-
-Current streak = 3
-
-Tuesday and Thursday should not break the streak because they are not
-scheduled days.
-
-==================================================
-5. BEST-EVER STREAK
-==================================================
-
-For every habit calculate the maximum number of consecutive scheduled
-occurrences that were completed in the entire history.
-
-Example:
-
-Monday       YES
-Wednesday    YES
-Friday       YES
-Monday       YES
-Wednesday    NO
-Friday       YES
-
-Best streak should be calculated from the completed scheduled
-occurrences.
-
-Store completion history in SQLite and calculate the streak from the
-history reliably.
-
-==================================================
-6. SEARCH HABIT
-==================================================
-
-Allow the user to search by habit name.
-
-Example:
-
-Search:
-water
-
-Results:
-
-1. Drink Water
-2. Drink Green Tea
-
-Search should be case-insensitive.
-
-==================================================
-7. UPDATE HABIT
-==================================================
-
-Allow the user to update:
-
-- habit name
-- description
-- schedule
-- start date
-- end date
-
-Do not delete historical completion records when updating a habit.
-
-==================================================
-8. ARCHIVE HABIT
-==================================================
-
-The problem says some habits are given up but should not be gone
-forever.
-
-Therefore implement ARCHIVE.
-
-When archived:
-
-- habit is hidden from active/today list
-- historical data remains
-- user can view archived habits
-- user can restore the habit later
-
-Do NOT permanently delete it.
-
-==================================================
-9. RESTORE HABIT
-==================================================
-
-Allow the user to restore an archived habit.
-
-After restoring, it should appear again if it is scheduled for today.
-
-==================================================
-10. HABIT HISTORY
-==================================================
-
-Allow the user to view completion history.
-
-Example:
-
-Habit: Workout
-
-2026-09-10   Completed
-2026-09-11   Not scheduled
-2026-09-12   Not scheduled
-2026-09-13   Completed
-
-Only scheduled dates need to be considered for streak calculation.
-
-==================================================
-11. 75-DAY CHALLENGE
-==================================================
-
-Implement a simple 75-day challenge progress system.
-
-Store challenge start date.
-
-Calculate:
-
-- current challenge day
-- completed challenge days
-- remaining days
-- progress percentage
-
-Example:
-
-========================================
-75-DAY CHALLENGE
-========================================
-
-Start Date: 2026-08-01
-Today: 2026-09-16
-
-Challenge Day: 47 / 75
-Remaining: 28 days
-Progress: 62.67%
-
-Keep this generic so the user can change the challenge start date.
-
-==================================================
-12. DATABASE
-==================================================
-
-Use SQLite.
-
-Create database automatically if it does not exist.
-
-Suggested tables:
-
-habits
-
-- id INTEGER PRIMARY KEY AUTOINCREMENT
-- name TEXT NOT NULL
-- description TEXT
-- schedule_type TEXT NOT NULL
-- schedule_days TEXT
-- start_date TEXT NOT NULL
-- end_date TEXT
-- archived INTEGER DEFAULT 0
-- created_at TEXT NOT NULL
-
-completions
-
-- id INTEGER PRIMARY KEY AUTOINCREMENT
-- habit_id INTEGER NOT NULL
-- completion_date TEXT NOT NULL
-- completed_at TEXT NOT NULL
-- FOREIGN KEY(habit_id) REFERENCES habits(id)
-- UNIQUE(habit_id, completion_date)
-
-challenge
-
-- id INTEGER PRIMARY KEY
-- start_date TEXT NOT NULL
-- duration INTEGER DEFAULT 75
-
-Use parameterized SQL queries.
-
-==================================================
-13. PROJECT STRUCTURE
-==================================================
-
-Keep the project simple.
-
-Use:
-
-habit_tracker/
-│
-├── main.py
-├── database.py
-├── habit_manager.py
-├── streak.py
-├── README.md
-├── REASONING.md
-├── AI_LOGS.md
-├── requirements.txt
-├── .gitignore
-└── tests/
-    └── test_streak.py
-
-Avoid unnecessary folders and dependencies.
-
-==================================================
-14. CODE DESIGN
-==================================================
-
-Separate responsibilities.
-
-main.py
-- terminal menu
-- user input
-- display output
-
-database.py
-- SQLite connection
-- table creation
-- database queries
-
-habit_manager.py
-- add habit
-- update habit
-- archive
-- restore
-- search
-- today's habits
-- completion
-
-streak.py
-- scheduled date logic
-- current streak
-- best streak
-
-tests/test_streak.py
-- streak tests
-
-==================================================
-15. STREAK ALGORITHM
-==================================================
-
-This is the most important business logic.
-
-Create a clean function such as:
-
-calculate_current_streak(habit, completion_dates)
-
-and:
-
-calculate_best_streak(habit, completion_dates)
-
-The algorithm must:
-
-1. Understand the habit schedule.
-2. Generate scheduled dates.
-3. Check which scheduled dates are completed.
-4. Ignore non-scheduled dates.
-5. Calculate consecutive completed scheduled occurrences.
-6. Calculate current streak.
-7. Calculate best-ever streak.
-
-Handle:
-
-- daily habits
-- weekday habits
-- custom schedules
-- future start dates
-- end dates
-- broken streaks
-- restarted streaks
-
-Document the algorithm clearly in REASONING.md.
-
-==================================================
-16. VALIDATION
-==================================================
-
-Validate:
-
-- empty habit name
-- invalid date
-- invalid menu choice
-- invalid habit ID
-- duplicate completion
-- invalid schedule
-- future start date
-- end date before start date
-
-The program should not crash because of normal invalid user input.
-
-==================================================
-17. TESTING
-==================================================
-
-Write tests for:
-
-- daily habit streak
-- weekday streak
-- custom schedule
-- broken streak
-- best-ever streak
-- current streak
-- non-scheduled days
-- duplicate completion
-
-Use Python unittest or pytest.
-
-Prefer unittest if no external dependency is necessary.
-
-==================================================
-18. README.md
-==================================================
-
-Create a professional README.md.
-
-Include:
-
-# 75-Day Habit Tracker
-
-## Project Overview
-
-## Features
-
-## Technology Stack
-
-## Project Structure
-
-## Requirements
+## Habit Scheduling
+Explain:
+- Every day
+- Weekdays
+- Custom days Monday-Sunday
+- Start date
+- End date
+- How scheduled dates are determined
+
+## Streak Calculation
+Explain the implemented streak logic at a high level.
+
+Important:
+- Streaks must be schedule-aware.
+- Non-scheduled days must not break a streak.
+- Current streak represents consecutive completed scheduled occurrences.
+- Best streak represents the maximum completed consecutive scheduled occurrences.
+- Mention support for daily, weekday, and custom schedules.
+
+Do not provide hidden chain-of-thought or internal reasoning.
+
+## Database
+Explain the SQLite database and the main tables used by the application.
+
+Document the purpose of:
+- habits
+- completions
+- challenge
+
+Mention important data-integrity behavior such as preventing duplicate completion for the same habit on the same date.
+
+## Data Persistence
+Explain that habit data, completion history, archive status, and challenge information are persisted using SQLite.
+
+## Input Validation
+Document the validation implemented for:
+- Empty habit names
+- Invalid dates
+- Invalid menu choices
+- Invalid habit IDs
+- Invalid schedules
+- Future start dates
+- End date before start date
+- Duplicate completion
+
+Only mention validations that are actually implemented.
+
+## Testing
+Document the project's automated tests.
+
+Mention the actual test command used by the project, for example:
+
+python -m pytest
+
+If the current test suite has a verified test result, document the actual result only.
+
+Do not invent test results.
 
 ## Installation
 
+Provide the actual installation/setup steps required for the project.
+
+If a virtual environment is recommended, explain the commands.
+
+If requirements.txt is present, explain how to install it.
+
 ## Running the Application
 
+Show:
+
 python main.py
+
+Explain that the application runs as a normal terminal/console Python application.
 
 ## Running Tests
 
-python -m unittest discover
+Show the correct command based on the current project:
 
-## Database
+python -m pytest
 
-Explain SQLite database.
+Do not document commands that are not applicable to the current test setup.
 
-## How Streaks Work
+## Error Handling
+Explain how the application handles normal invalid user input without crashing.
 
-Explain the algorithm at a high level.
+## Design
+Briefly explain the separation of responsibilities between:
+- main.py
+- database.py
+- habit_manager.py
+- streak.py
+- test files
 
-## Debugging
+Keep this as an engineering overview, not hidden reasoning.
 
-Give common problems and solutions.
+## Data Integrity
+Explain:
+- SQLite persistence
+- Foreign-key relationship between habits and completions if implemented
+- Unique completion protection
+- Preservation of completion history
+- Archive instead of permanent deletion
 
-## Future Improvements
+Only describe what the source code actually implements.
+
+## Example Workflow
+Provide a short example of how a user can:
+1. Add a habit
+2. View today's habits
+3. Complete the habit
+4. View its streak
+5. View history
+6. Archive/restore it
+
+## Requirements
+List the actual runtime and testing requirements.
+
+## Project Status
+Describe the current implementation status based on the actual project files and tests.
 
 ## Author
 
-Krishna Khandelwal
+Krish Khandelwal
 
-Do not claim features that are not implemented.
-
-==================================================
-19. REASONING.md
-==================================================
-
-Create REASONING.md.
-
-Do NOT provide hidden chain-of-thought.
-
-Instead write an engineering decision document explaining:
-
-- How the problem statement was interpreted
-- Requirements derived from the statement
-- Why a terminal application was selected
-- Why SQLite was selected
-- Data model
-- Scheduling design
-- Streak calculation design
-- Current streak
-- Best streak
-- Archive design
-- Search design
-- Validation
-- Testing
-- Edge cases
-- Trade-offs
-- Future improvements
-
-==================================================
-20. AI_LOGS.md
-==================================================
-
-DO NOT fabricate AI logs.
-
-The company requires the COMPLETE AI conversation.
-
-The actual AI conversation used during development must be copied into
-AI_LOGS.md exactly as required by the company.
-
-Do not create fake conversations.
-
-Do not summarize the AI conversation.
-
-Do not modify the actual conversation.
-
-==================================================
-21. IMPORTANT
-==================================================
-
-This is a placement assessment.
-
-Prioritize:
-
-1. Working functionality
-2. Correct streak logic
-3. Persistent database
-4. Clean code
-5. Good error handling
-6. Tests
-7. README and REASONING
-8. UI polish only if relevant
-
-Do not add:
-
-- Login/authentication
-- Cloud database
-- React
-- HTML
-- CSS
-- REST API
-- unnecessary third-party packages
-- complex architecture
-
-unless absolutely necessary.
-
-The final project should be a NORMAL Python terminal application that
-can be run directly using:
-
-python main.py
-
-==================================================
-FINAL CHECK
-==================================================
-
-Before finishing, verify:
-
-[ ] python main.py works
-[ ] SQLite database is created automatically
-[ ] Add habit works
-[ ] View today's habits works
-[ ] Complete habit works
-[ ] Duplicate completion is prevented
-[ ] Current streak is correct
-[ ] Best streak is correct
-[ ] Daily schedule works
-[ ] Weekday schedule works
-[ ] Custom schedule works
-[ ] Non-scheduled days do not break streak
-[ ] Update habit works
-[ ] Search works
-[ ] Archive works
-[ ] Restore works
-[ ] History works
-[ ] 75-day progress works
-[ ] Invalid input does not crash program
-[ ] Tests pass
-[ ] README.md exists
-[ ] REASONING.md exists
-[ ] AI_LOGS.md exists
-[ ] .gitignore exists
-[ ] No secrets are committed
-[ ] Author is shown as Krishna Khandelwal
-
-First explain the implementation plan briefly.
-
-Then create the project files and code.
+IMPORTANT FINAL RULES:
+1. The README must contain ONLY project-related content.
+2. English only.
+3. Markdown only.
+4. No conversational introduction or conclusion.
+5. No emojis unless genuinely appropriate for a professional GitHub README.
+6. No frontend/web technologies should be described because this is a terminal application.
+7. Do not add features that do not exist.
+8. Do not modify application code.
+9. Do not fabricate test results.
+10. Save the final content directly to README.md.
