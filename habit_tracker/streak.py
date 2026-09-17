@@ -111,9 +111,14 @@ def calculate_current_streak(habit, completion_dates):
         return 0
 
     index = len(scheduled_dates) - 1
-    while index >= 0 and scheduled_dates[index] not in completion_set:
+    if (
+        scheduled_dates[index] == date.today()
+        and scheduled_dates[index] not in completion_set
+    ):
         index -= 1
     if index < 0:
+        return 0
+    if scheduled_dates[index] not in completion_set:
         return 0
 
     streak = 0

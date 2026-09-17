@@ -1,5 +1,5 @@
 import unittest
-from datetime import date
+from datetime import date, timedelta
 
 from habit_tracker.streak import calculate_best_streak, calculate_current_streak
 
@@ -14,7 +14,7 @@ class StreakTests(unittest.TestCase):
         }
 
     def test_daily_habit_streak(self):
-        habit = self.make_habit('daily', start_date='2026-09-01')
+        habit = self.make_habit('daily', start_date='2026-09-01', end_date='2026-09-05')
         completion_dates = {
             date(2026, 9, 1),
             date(2026, 9, 2),
@@ -26,7 +26,7 @@ class StreakTests(unittest.TestCase):
         self.assertEqual(calculate_best_streak(habit, completion_dates), 5)
 
     def test_weekday_streak(self):
-        habit = self.make_habit('weekday')
+        habit = self.make_habit('weekday', end_date='2026-09-11')
         completion_dates = {
             date(2026, 9, 7),
             date(2026, 9, 8),
@@ -61,7 +61,7 @@ class StreakTests(unittest.TestCase):
         self.assertEqual(calculate_current_streak(habit, completion_dates), 5)
 
     def test_broken_streak_resets(self):
-        habit = self.make_habit('daily', start_date='2026-09-01')
+        habit = self.make_habit('daily', start_date='2026-09-01', end_date='2026-09-06')
         completion_dates = {
             date(2026, 9, 1),
             date(2026, 9, 2),
@@ -71,6 +71,16 @@ class StreakTests(unittest.TestCase):
         }
         self.assertEqual(calculate_current_streak(habit, completion_dates), 2)
         self.assertEqual(calculate_best_streak(habit, completion_dates), 3)
+
+    def test_yesterday_missed_today_pending_breaks_streak(self):
+        today = date.today()
+        habit = self.make_habit('daily', start_date=today - timedelta(days=20))
+        completion_dates = {
+            today - timedelta(days=offset)
+            for offset in range(2, 21)
+        }
+
+        self.assertEqual(calculate_current_streak(habit, completion_dates), 0)
 
 
 if __name__ == '__main__':
